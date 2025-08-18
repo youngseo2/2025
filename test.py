@@ -1,5 +1,4 @@
-# app.py
-# 실행: streamlit run app.py
+
 import streamlit as st
 import random
 
