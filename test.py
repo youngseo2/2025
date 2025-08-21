@@ -1,5 +1,4 @@
 import streamlit as st
-import random
 import datetime
 
 st.title("📚 공부 도우미")
@@ -11,6 +10,12 @@ today = str(datetime.date.today())
 
 if "diary" not in st.session_state:
     st.session_state.diary = {}
+
+if "tasks" not in st.session_state:
+    st.session_state.tasks = {}
+
+if today not in st.session_state.tasks:
+    st.session_state.tasks[today] = []
 
 # -------------------------
 # 명언 추천
@@ -41,12 +46,6 @@ if st.button("✨ 오늘의 명언 보기"):
 # -------------------------
 st.header("📝 오늘의 할 일")
 
-if "tasks" not in st.session_state:
-    st.session_state.tasks = {}
-
-if today not in st.session_state.tasks:
-    st.session_state.tasks[today] = []
-
 new_task = st.text_input("할 일을 입력하세요:")
 
 if st.button("추가하기"):
@@ -67,6 +66,34 @@ st.header("📖 오늘의 메모")
 
 diary_text = st.text_area("오늘 하루를 기록하세요:", st.session_state.diary.get(today, ""))
 
+# 🟢 키워드 → 이모지 매핑
+emoji_map = {
+    # 음식
+    "밥": "🍚", "라면": "🍜", "김치": "🥬", "고기": "🍖", "치킨": "🍗",
+    "피자": "🍕", "햄버거": "🍔", "떡볶이": "🍢", "과일": "🍎", "케이크": "🍰",
+    "커피": "☕", "음료": "🥤",
+
+    # 활동/하루 일과
+    "공부": "📖", "시험": "✏️", "학교": "🏫", "운동": "🏃", "축구": "⚽",
+    "게임": "🎮", "영화": "🎬", "산책": "🚶", "여행": "✈️", "쇼핑": "🛍️",
+
+    # 감정/상태
+    "행복": "😄", "기분": "🙂", "슬픔": "😢", "피곤": "🥱", "스트레스": "😵",
+    "재밌": "😂", "화남": "😡", "놀람": "😲"
+}
+
+def add_emojis(text: str) -> str:
+    result = text
+    for word, emoji in emoji_map.items():
+        if word in result:
+            result = result.replace(word, f"{word}{emoji}")
+    return result
+
 if st.button("💾 메모 저장"):
     st.session_state.diary[today] = diary_text
     st.success("오늘의 메모가 저장되었습니다 ✅")
+
+# 저장된 메모 출력 (이모티콘 변환)
+if today in st.session_state.diary:
+    st.subheader("📌 오늘 기록 보기")
+    st.write(add_emojis(st.session_state.diary[today]))
